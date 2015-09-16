@@ -37,6 +37,7 @@ abstract class Postac {
     public function wykonajAtak(Postac $postac) {
         if ($this->czyAtakSkutecznoy($postac)) {
             $this->odbierzPunkt($postac);
+            return "Atak Skuteczny";
         }
     }
 

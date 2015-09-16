@@ -69,53 +69,59 @@ class Tura {
     }
 
     /**
-     * Wyświetla parametry Gracza
-     * @param Postac\Postac $postac
-     */
-    private function wiadomosc(Postac\Postac $postac) {
-
-        Console::write($postac->Getparam()->getSzybkosc());
-        Console::write($postac->Getparam()->getSila());
-        Console::write($postac->Getparam()->getZrecznosc());
-        Console::write($postac->Getparam()->getZycie());
-    }
-
-    /**
      * Wywołuje truę przeciwnika
      * Wywołuje funkcję wiadomość oraz czas_trwania
      */
     public function tura_przeciwnika() {
+        $this->kolejg=true;
         do{
             $this->punktyprzeciwnik--;
-            Console::write("atak przeciwnika");
-            $this->przeciwnik->wykonajAtak($this->gracz);
-            $this->gracz->czas_trwania();
-            $this->wiadomosc($this->gracz);
+            $atak[]=$this->przeciwnik->wykonajAtak($this->gracz);
+            ++$ilosc;
         }
         while( $this->punktyprzeciwnik==0);
+        return $atak[0]+"*"+$ilosc;
         
     }
-
     /**
      * Wywołuje funkcje akcji w pętli Zależnie od punktów akcji
      * Ustawia turę przeciwnika
      * @param type $opcja
      */
-    public function akcja($opcja) {
-        if($opcja!=null && $this->kolejg==true){
-            $this->opcja($opcja);
-            $this->punktygracz--;
-            $this->kolejp=true;
+    public function akcja1($opcja) {
+        
+        if($this->punktygracz>0 && $this->kolejg==true){
+            return $this->opcja($opcja);
         }
-        elseif($this->punktyprzeciwnik>0 && $this->kolejp==true){
-        $this->tura_przeciwnika();
-        $this->kolejg=true;
-        $this->wyborruchu();
+    }
+
+   public function akcja2(){
+       
+       if($this->punktyprzeciwnik>0 && $this->punktygracz<=0){
+       $this->kolejp=true;
+       return;
+       }
+       elseif($this->punktygracz>0){
+           return $this->wyborruchu();
+       }
+   }
+   public function akcja3(){
+       
+       if($this->punktyprzeciwnik>0 && $this->kolejp==true){
+        return $this->tura_przeciwnika();
         }
-        else{
-            $this->aktywne();
+        else{return;}
+   }
+    public function losowanie(){
+        if($this->punktyprzeciwnik<=0 && $this->punktygracz<=0){
+        $this->aktywne();
             $this->czyjatura();
-            $this->wyborruchu();
+            $this->gracz->czas_trwania();
+            if($this->wyborruchu()!=null){
+            return $this->tura_przeciwnika()+"/n"+$this->wyborruchu();}
+            else{return $this->wyborruchu();}
+        }else{
+        return;
         }
     }
 
@@ -126,20 +132,22 @@ class Tura {
     public function opcja($opcja) {
         switch ($opcja) {
             case "a":
-
-                $this->gracz->wykonajAtak($this->przeciwnik);
-                break;
+            
+                $this->punktygracz--;
+                return $this->gracz->wykonajAtak($this->przeciwnik);
+                
             case "b":
-                Console::write("Podaj poziom Eliksiru");
-                $this->gracz->utworz_eliksir();
-                break;
-            case "c":
-                $this->gracz->wypij();
-                break;
+                $this->punktygracz--;
+                return $this->gracz->utworz_eliksir();
+            
+                case "c":
+                $this->punktygracz--;
+                return $this->gracz->wypij();
+                
             case "d":
-                $this->gracz->wykonajObrone();
-                break;
-
+                 $this->punktygracz--;
+               return  $this->gracz->wykonajObrone();
+               
             default:
                 //                exit();
                 break;
@@ -159,6 +167,8 @@ class Tura {
             $punkty = $this->obliczpunkty($szybkoscp, $szybkoscg);
             $this->przeciwnik->Getparam()->setpktakcji($punkty);
         }
+        $this->punktygracz=$this->gracz->Getparam()->getpktakcji();
+        $this->punktyprzeciwnik=$this->przeciwnik->Getparam()->getpktakcji();        
     }
 
     /**
@@ -210,5 +220,11 @@ public function losowy(){
               </form>';
         }
     }
-
+    public function utwurzeliksirform(){
+        return  '<form action="index.php" method="POST>
+                 
+                  
+                    <input type="submit" value="Wybierz akcje">
+              </form>';
+    }
 }

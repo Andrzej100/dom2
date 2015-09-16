@@ -34,7 +34,7 @@ class Wiedzmin extends Postac {
         $this->param->setZrecznosc($this->param->getZrecznosc() + $dodaj);
         $this->aktywnaObrona = true;
 
-        return true;
+        return "Obrona";
     }
 
     /**
@@ -58,9 +58,10 @@ class Wiedzmin extends Postac {
      */
     public function utworz_eliksir() {
         if ($this->iloscElixir > 0) {
-            $poziom = \Console::read();
+            $poziom=rand(1,3);
             $this->eliksir = new \Eliksir($this, $poziom);
             $this->iloscElixir--;
+            return "Eliksir Zostal utworzony";
         }
     }
 
@@ -86,21 +87,20 @@ class Wiedzmin extends Postac {
                 $this->eliksir->zycie();
                 $this->czas_trwania();
                 $this->wypij = true;
-                break;
+                return "wypito eliksir zycie";
             case 2:
                 $this->eliksir->sila();
                 $this->czas_trwania();
                 $this->wypij = true;
-                break;
+                return "wypitio eliksir sila";
             case 3:
                 $this->eliksir->szybkosc();
                 $this->czas_trwania();
                 $this->wypij = true;
-                break;
+                return "wypito eliksir szybkosc";
 
             default:
-                \Console::write("Podaj z przedzialu 1-3");
-                break;
+               return "Podaj z przedzialu 1-3";
         }
     }
 
@@ -142,12 +142,15 @@ class Wiedzmin extends Postac {
     
     public function aktywnyEkwipunek($bron){
       
-            if ($this->ekwipunek[0][typ] == 'bron') {
-                $this->bron = new Bron($this->ekwipunek[0][nazwa],$this->ekwipunek[0][param1],$this->ekwipunek[0][param2]);
+            if ($bron->gettype() == 'bron') {
+                $this->bron = $bron;
+                return "Ustawiono nowa bron";
             }
-            if ($this->ekwipunek[0][typ] == 'zbroja') {
-                $this->zbroja = new Zbroja($this->ekwipunek[0][nazwa],$this->ekwipunek[0][param1],$this->ekwipunek[0][param2]);
-            }
+            if ($bron->gettype()== 'zbroja') {
+                $this->zbroja =$bron;
+                return "Ustawiono nowa zbroja";
+            } 
+           
         }
     
 }
